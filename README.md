@@ -28,8 +28,8 @@ Clone the repository to your local repository.
 ```
 
 ## Usage
-After cloning and installing it can run in localhost:3000.
-OR
+After cloning and installing it can run in localhost:3000.<br/>
+OR<br/>
 Direct Link for Render:
 ```
 
@@ -39,9 +39,9 @@ Direct Link for Render:
 
 ## Screenshots
 Here are some of the screenshots of the application.
-![Screenshot image of the application.](./src/assets/screenshots/screenshot-1.png)
-![Screenshot image of the application.](./src/assets/screenshots/screenshot-2.png)
-![Screenshot image of the application.](./src/assets/screenshots/screenshot-3.png)
+![Screenshot image of the application.](./assets/screenshots/screenshot-1.png)
+![Screenshot image of the application.](./assets/screenshots/screenshot-2.png)
+![Screenshot image of the application.](./assets/screenshots/screenshot-3.png)
 
 
 ## License
