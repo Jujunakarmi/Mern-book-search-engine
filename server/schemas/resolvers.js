@@ -47,6 +47,20 @@ Mutation: {
         const token = signToken(user);
         return { token, user };
     },
+
+    //Save books
+    saveBook: async(parent, {bookInput}, context) => {
+        if(context.user) {
+            // Push the new book into the user's savedBooks field array
+            const user = await User.findByIdAndUpdate(
+                {_id: context.user._id},
+                {$push: {savedBooks: bookInput}},
+                {new: true}
+            );
+            return user;   
+        }
+        throw AuthenticationError;
+    }
 }
 }
 

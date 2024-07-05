@@ -9,12 +9,15 @@ import {
 } from 'react-bootstrap';
 
 import Auth from '../utils/auth';
-import { saveBook, searchGoogleBooks } from '../utils/API';
+import { searchGoogleBooks } from '../utils/API';
 import { saveBookIds, getSavedBookIds } from '../utils/localStorage';
+import { useMutation } from "@apollo/client";
+import { SAVE_BOOK } from "../utils/mutations";
 
 const SearchBooks = () => {
   // create state for holding returned google api data
   const [searchedBooks, setSearchedBooks] = useState([]);
+
   // create state for holding our search field data
   const [searchInput, setSearchInput] = useState('');
 
@@ -36,6 +39,7 @@ const SearchBooks = () => {
     }
 
     try {
+       // Use Google API to fetch book search results using searchInput
       const response = await searchGoogleBooks(searchInput);
 
       if (!response.ok) {
@@ -44,12 +48,14 @@ const SearchBooks = () => {
 
       const { items } = await response.json();
 
+      // Create an object for the bookData to present
       const bookData = items.map((book) => ({
         bookId: book.id,
         authors: book.volumeInfo.authors || ['No author to display'],
         title: book.volumeInfo.title,
         description: book.volumeInfo.description,
         image: book.volumeInfo.imageLinks?.thumbnail || '',
+        link: book.volumeInfo.infoLink
       }));
 
       setSearchedBooks(bookData);
@@ -58,6 +64,10 @@ const SearchBooks = () => {
       console.error(err);
     }
   };
+
+
+    // Use the useMutation hook to handle saveBook
+    const [saveBook, { error }] = useMutation(SAVE_BOOK);
 
   // create function to handle saving a book to our database
   const handleSaveBook = async (bookId) => {
@@ -72,12 +82,16 @@ const SearchBooks = () => {
     }
 
     try {
-      const response = await saveBook(bookToSave, token);
-
-      if (!response.ok) {
-        throw new Error('something went wrong!');
-      }
-
+  // Use the saveBook mutation to handle saveBook using bookToSave as a variable
+  const { data } = await saveBook({
+    variables: {
+      bookInput: { ...bookToSave }
+    }
+  });
+   // Check if saveBook was successful
+   if (error) {
+    throw new Error ("Failed to save Book.");
+  }
       // if book successfully saves to user's account, save book id to state
       setSavedBookIds([...savedBookIds, bookToSave.bookId]);
     } catch (err) {
