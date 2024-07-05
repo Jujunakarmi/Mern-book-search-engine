@@ -6,9 +6,10 @@ import {
   Row,
   Col
 } from 'react-bootstrap';
-import{useQuery} from '@apollo/client'
+import{useQuery, useMutation} from '@apollo/client'
 
 import { GET_ME} from '../utils/queries';
+import { REMOVE_BOOK } from "../utils/mutations";
 import Auth from '../utils/auth';
 import { removeBookId } from '../utils/localStorage';
 
@@ -19,6 +20,9 @@ const SavedBooks = () => {
  // Check that the GET_ME query was successful and data for `me` was retrieved
  const userData = data?.me || {};
 
+ // Use the useMutation() Hook to execute the REMOVE_BOOK mutation in the handleDeleteBook() function 
+ const [removeBook, { error }] = useMutation(REMOVE_BOOK);
+
   // create function that accepts the book's mongo _id value as param and deletes the book from the database
   const handleDeleteBook = async (bookId) => {
     const token = Auth.loggedIn() ? Auth.getToken() : null;
@@ -28,7 +32,17 @@ const SavedBooks = () => {
     }
 
     try {
-      
+      // Use the removeBook mutation to remove book from the user's saved books
+      const { data } = await removeBook({
+        variables: { bookId }
+      });
+        // Check if removeBook was successful 
+        if (error) {
+          throw new Error("Failed to remove Book.")
+        }
+  
+        // Upon success, remove book's id from localStorage
+        removeBookId(bookId);
     } catch (err) {
       console.error(err);
     }
@@ -61,7 +75,10 @@ const SavedBooks = () => {
                   <Card.Body>
                     <Card.Title>{book.title}</Card.Title>
                     <p className='small'>Authors: {book.authors}</p>
-                    <Card.Text>{book.description}</Card.Text>
+                    <Card.Text>{book.description}
+                    <br/>
+                    <a href={book.link} target='_blank'>View on Google Books</a>
+                    </Card.Text>
                     <Button className='btn-block btn-danger' onClick={() => handleDeleteBook(book.bookId)}>
                       Delete this Book!
                     </Button>
